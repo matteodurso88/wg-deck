@@ -98,7 +98,7 @@ class NativeSystemInventoryTests(unittest.TestCase):
             ):
                 names = PUBLISHER.publish(configs, destination, reader_gid=0)
             self.assertEqual(names, ("existing-profile",))
-            self.assertEqual(destination.read_text("ascii"), "existing-profile\\n")
+            self.assertEqual(destination.read_text("ascii"), "existing-profile\n")
             self.assertEqual(stat.S_IMODE(destination.stat().st_mode), 0o644)
             self.assertNotIn("SENSITIVE", destination.read_text())
 
@@ -106,7 +106,7 @@ class NativeSystemInventoryTests(unittest.TestCase):
         with tempfile.TemporaryDirectory() as folder:
             root = Path(folder)
             secret = root / "reader-gid"
-            secret.write_text("1000\\n")
+            secret.write_text("1000\n")
             (root / "link").symlink_to(secret)
             with self.assertRaises(OSError):
                 PUBLISHER.configured_group(root / "link")
