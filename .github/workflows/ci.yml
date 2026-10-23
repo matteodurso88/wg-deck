@@ -71,6 +71,11 @@ jobs:
               python3 -c "import wg_deck; from PySide6.QtWidgets import QApplication; from PySide6.QtSvg import QSvgRenderer; from wg_deck.ui.window import MainWindow; app=QApplication([]); window=MainWindow(demo=True); window.close(); print(\"Ubuntu 26.04 Qt demo smoke PASS\")"
               dpkg -L wg-deck | grep -q /usr/lib/wg-deck/wg-deck-helper
               test ! -e /etc/wg-deck-reader-gid
+              /usr/lib/wg-deck/wg-deck-inventory
+              grep -qx ci-canary /run/wg-deck-profiles.list
+              test "$(stat -c %a /run/wg-deck-profiles.list)" = 644
+              su -s /bin/sh nobody -c "grep -qx ci-canary /run/wg-deck-profiles.list"
+              test ! -f /etc/wireguard/nonexistent.conf
               if systemctl is-enabled wg-deck-inventory.timer 2>/dev/null | grep -q enabled; then
                 echo "Inventory unexpectedly enabled"; exit 1
               fi
@@ -82,5 +87,5 @@ jobs:
               test ! -e /usr/lib/wg-deck/wg-deck-helper
               apt-get purge -y wg-deck
               test "$(sha256sum /etc/wireguard/ci-canary.conf | cut -d " " -f 1)" = "$before"
-              echo "APT install/reinstall/remove/purge and native config preservation: PASS"
+              echo "APT install/reinstall/remove/purge, first-launch inventory visibility and VPN preservation: PASS"
             '
