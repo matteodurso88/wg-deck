@@ -1,5 +1,6 @@
 #!/usr/bin/env bash
-# Optional, explicitly requested system inventory activation.
+# Optional privacy restriction or administrative disable. APT now activates
+# safe, read-only inventory automatically at installation (no setup needed).
 # Never creates/deletes a VPN config or starts/stops an interface.
 set -euo pipefail
 [[ "$(id -u)" == 0 ]] || { echo "Run with sudo (e.g. sudo wg-deck-setup --enable-inventory USER)." >&2; exit 2; }
@@ -10,8 +11,8 @@ case "$*" in
     echo "WG Deck inventory publisher disabled. VPN connections unaffected."
     ;;
   *)
-    [[ "$#" -eq 2 && "$1" == "--enable-inventory" ]] || {
-      echo "Usage: sudo wg-deck-setup --enable-inventory USER | --disable-inventory" >&2
+    [[ "$#" -eq 2 && ( "$1" == "--enable-inventory" || "$1" == "--restrict-inventory" ) ]] || {
+      echo "Usage: sudo wg-deck-setup --restrict-inventory USER | --disable-inventory" >&2
       exit 2
     }
     username="$2"
@@ -22,7 +23,7 @@ case "$*" in
     [[ -n "$account" ]] || { echo "User not found" >&2; exit 2; }
     gid="$(id -g "$username")"
     [[ "$gid" =~ ^[0-9]+$ && "$gid" -gt 0 ]] || { echo "Unsafe user group" >&2; exit 2; }
-    # Keep legacy group-based inventory access and explicit owner choice.
+    # Restrict the otherwise world-readable, non-secret metadata to one primary group.
     # Atomic root-owned replacement prevents following a malicious symlink.
     config="$(mktemp /etc/.wg-deck-reader-gid.XXXXXXXX)"
     trap 'rm -f "$config"' EXIT
@@ -34,7 +35,7 @@ case "$*" in
     systemctl daemon-reload
     systemctl enable --now wg-deck-inventory.path wg-deck-inventory.timer
     systemctl start wg-deck-inventory.service
-    echo "Inventory enabled for primary group of $username (GID $gid)."
+    echo "Read-only inventory visibility restricted to primary group of $username (GID $gid)."
     echo "No WireGuard interface was started or stopped."
     ;;
 esac
