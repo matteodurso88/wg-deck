@@ -25,7 +25,7 @@ sudo apt install ./wg-deck_1.0.0-2_all.deb
 wg-deck --demo
 ```
 
-Il pacchetto installa app, icone, helper root-owned, policy Polkit e unità systemd. Su Ubuntu **attiva automaticamente il publisher in sola lettura**: i profili WireGuard esistenti sono disponibili già al primo avvio, senza comandi aggiuntivi. **Non connette né disconnette VPN.** Nella modalità predefinita i metadati sanitizzati sono leggibili dagli utenti locali; un amministratore può limitarli a un gruppo primario usando `sudo wg-deck-setup --enable-inventory "$USER"`. Per rimozione e upgrade consulta [Installazione](docs/it/INSTALL.md). La v1.0.0 è ancora candidata, **non una release già pubblicata**.
+Il pacchetto installa app, icone, helper root-owned, policy Polkit e unità systemd. Su Ubuntu **attiva automaticamente il publisher in sola lettura**: i profili WireGuard esistenti sono disponibili già al primo avvio, senza comandi aggiuntivi. **Non connette né disconnette VPN.** Nella modalità predefinita i metadati sanitizzati sono leggibili dagli utenti locali; un amministratore può limitarli a un gruppo primario usando `sudo wg-deck-setup --restrict-inventory "$USER"`. Per rimozione e upgrade consulta [Installazione](docs/it/INSTALL.md). La v1.0.0 è ancora candidata, **non una release già pubblicata**.
 
 ## Anteprima dai sorgenti
 
