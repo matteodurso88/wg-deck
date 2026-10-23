@@ -15,7 +15,7 @@ I nomi sono validati; la scrittura rifiuta symlink e collisioni e usa permessi `
 
 ## Packaging Debian e attivazione esplicita
 
-Il pacchetto Debian installa helper root-owned in `/usr/lib/wg-deck/` e policy Polkit in `/usr/share/polkit-1/actions/`. L'installazione non avvia VPN né abilita l'inventario. Solo il comando esplicito `sudo wg-deck-setup --enable-inventory USER` configura il gruppo primario autorizzato alla lettura e avvia il publisher in sola lettura. Gli appartenenti a tale gruppo possono vedere i nomi delle interfacce e le statistiche aggregate: scegliere attentamente l'account. La rimozione e il purge APT non modificano `/etc/wireguard/`. Non mischiare gli helper di sviluppo in `/usr/local/libexec` con il pacchetto APT.
+Il pacchetto Debian installa helper root-owned in `/usr/lib/wg-deck/` e policy Polkit in `/usr/share/polkit-1/actions/`. L'installazione abilita automaticamente il publisher **in sola lettura** sui sistemi systemd, senza avviare o fermare tunnel. Gli snapshot root-owned con nomi di profili e traffico sono leggibili dagli utenti locali (`0644`) per impostazione predefinita: anche altri account locali possono quindi vedere questi metadati. Non contengono chiavi, endpoint o configurazioni. Su macchine condivise è possibile limitare l'accesso al gruppo primario scelto (`0640`) con `sudo wg-deck-setup --enable-inventory USER`. Per il primo avvio non serve alcuna configurazione manuale. La rimozione e il purge APT non modificano `/etc/wireguard/`. Non mischiare gli helper di sviluppo in `/usr/local/libexec` con il pacchetto APT.
 
 ## Rischi residui
 
