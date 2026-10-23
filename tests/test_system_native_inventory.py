@@ -90,15 +90,15 @@ class NativeSystemInventoryTests(unittest.TestCase):
             root = Path(folder)
             configs = root / "etc_wireguard"
             configs.mkdir(mode=0o700)
-            (configs / "existing-profile.conf").write_text("PrivateKey = SENSITIVE")
+            (configs / "office-vpn.conf").write_text("PrivateKey = SENSITIVE")
             destination = root / "native.txt"
             self.assertEqual(PUBLISHER.configured_group(root / "missing-reader-gid"), 0)
             with patch.object(PUBLISHER.os, "geteuid", return_value=0), patch.object(
                 PUBLISHER.os, "fchown"
             ):
                 names = PUBLISHER.publish(configs, destination, reader_gid=0)
-            self.assertEqual(names, ("existing-profile",))
-            self.assertEqual(destination.read_text("ascii"), "existing-profile\n")
+            self.assertEqual(names, ("office-vpn",))
+            self.assertEqual(destination.read_text("ascii"), "office-vpn\n")
             self.assertEqual(stat.S_IMODE(destination.stat().st_mode), 0o644)
             self.assertNotIn("SENSITIVE", destination.read_text())
 
