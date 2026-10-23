@@ -13,7 +13,7 @@ done
 version="$(python3 -c 'import tomllib; print(tomllib.load(open("pyproject.toml", "rb"))["project"]["version"])')"
 [[ "$version" =~ ^[0-9]+\.[0-9]+\.[0-9]+$ ]] || { echo "Unexpected version" >&2; exit 2; }
 # Debian packaging revision 2 upgrades the already-installed 1.0.0 candidate.
-deb_version="${version}-2"
+deb_version="${version}-3"
 output="$PWD/dist"
 mkdir -p "$output"
 # Remove only earlier WG Deck .deb artifacts so checksum cannot select a stale package.
@@ -139,6 +139,7 @@ for language in en it; do
   done
 done
 install -m 0644 packaging/debian/copyright "$stage/usr/share/doc/wg-deck/copyright"
+install -m 0755 packaging/debian/prerm "$stage/DEBIAN/prerm"
 install -m 0755 packaging/debian/postinst "$stage/DEBIAN/postinst"
 install -m 0755 packaging/debian/postrm "$stage/DEBIAN/postrm"
 cat > "$stage/DEBIAN/control" <<EOF
