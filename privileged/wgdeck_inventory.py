@@ -3,8 +3,10 @@
 
 Root-owned oneshot invoked by both a directory watcher and a 10-second timer.
 Never opens profile contents, logs peer public keys, or executes wg-quick.
-Both files are restricted root-owned snapshots readable by the installing
-user's primary group only (0640). Any unavailable transfer stays unknown.
+The Debian package publishes root-owned, non-secret names and aggregate traffic
+metadata for all local users by default (0644), so newly installed desktops
+work immediately. An administrator may opt into primary-group-only reads (0640).
+No configuration contents, endpoints or private keys are published.
 """
 from __future__ import annotations
 
@@ -41,7 +43,12 @@ def native_profiles(directory: Path) -> tuple[str, ...]:
 
 
 def configured_group(path: Path = READER_GID) -> int:
-    fd = os.open(path, os.O_RDONLY | os.O_NOFOLLOW | os.O_CLOEXEC)
+    # Missing config is the standard Debian install: root group and world-
+    # readable non-secret metadata. Other errors must fail closed.
+    try:
+        fd = os.open(path, os.O_RDONLY | os.O_NOFOLLOW | os.O_CLOEXEC)
+    except FileNotFoundError:
+        return 0
     try:
         info = os.fstat(fd)
         if not stat.S_ISREG(info.st_mode) or info.st_uid != 0 or info.st_mode & 0o077:
@@ -71,7 +78,7 @@ def publish(directory: Path = SYSTEM_DIR, destination: Path = SNAPSHOT,
     fd, staged = tempfile.mkstemp(prefix=".wgdeck-profiles-", dir=destination.parent)
     try:
         os.fchown(fd, 0, reader_gid)
-        os.fchmod(fd, 0o640)
+        os.fchmod(fd, 0o644 if reader_gid == 0 else 0o640)
         with os.fdopen(fd, "wb") as stream:
             stream.write(data)
             stream.flush()
@@ -191,7 +198,7 @@ def publish_traffic(
     fd, staged = tempfile.mkstemp(prefix=".wgdeck-traffic-", dir=destination.parent)
     try:
         os.fchown(fd, 0, reader_gid)
-        os.fchmod(fd, 0o640)
+        os.fchmod(fd, 0o644 if reader_gid == 0 else 0o640)
         with os.fdopen(fd, "wb") as stream:
             stream.write(payload)
             stream.flush()

@@ -19,7 +19,7 @@ Publisher systemd root-owned: .service + .path + .timer
     └── /etc/wireguard/*.conf (solo nomi e statistiche, mai chiavi)
 ```
 
-Nel pacchetto Debian gli helper root-owned risiedono in `/usr/lib/wg-deck/`, le policy in `/usr/share/polkit-1/actions/` e le unità in `/usr/lib/systemd/system/`. L'installer manuale di sviluppo usa invece `/usr/local/libexec/`; il builder traduce esplicitamente i percorsi ed esegue controlli. I due modelli d'installazione non devono essere combinati. Il publisher resta disabilitato finché non viene eseguito `sudo wg-deck-setup --enable-inventory USER`.
+Nel pacchetto Debian gli helper root-owned risiedono in `/usr/lib/wg-deck/`, le policy in `/usr/share/polkit-1/actions/` e le unità in `/usr/lib/systemd/system/`. L'installer manuale di sviluppo usa invece `/usr/local/libexec/`; il builder traduce esplicitamente i percorsi ed esegue controlli. I due modelli d'installazione non devono essere combinati. Il pacchetto Debian abilita automaticamente il publisher in sola lettura sui desktop systemd e rende accessibili gli snapshot sanitizzati root-owned (`0644`) già al primo avvio. Su richiesta si può limitare l'accesso a un gruppo (`0640`) con `sudo wg-deck-setup --restrict-inventory USER`.
 
 La directory di sistema `/etc/wireguard/` è la fonte canonica: nessun registro parallelo dei profili. Le preferenze Qt conservano soltanto opzioni della GUI.
 

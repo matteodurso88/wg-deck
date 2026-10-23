@@ -59,6 +59,22 @@ class MetricsSecurityTests(unittest.TestCase):
             self.assertEqual(rows["demo-vpn"], TrafficRow(True, 600, 300, 1700000008))
             self.assertEqual(rows["down-lab"], TrafficRow(False, 0, 0, None))
 
+    def test_default_debian_traffic_snapshot_has_no_user_setup_dependency(self):
+        with tempfile.TemporaryDirectory() as folder:
+            destination = Path(folder) / "traffic.tsv"
+            with (
+                patch.object(PUBLISHER.os, "geteuid", return_value=0),
+                patch.object(PUBLISHER.os, "fchown"),
+                patch.object(PUBLISHER, "_wg_lines", return_value=""),
+            ):
+                PUBLISHER.publish_traffic(("office-vpn",), destination,
+                                          reader_gid=0, now=1700000020)
+            self.assertEqual(stat.S_IMODE(destination.stat().st_mode), 0o644)
+            self.assertEqual(
+                parse_traffic_snapshot(destination.read_bytes(), now=1700000020)["office-vpn"],
+                TrafficRow(False, 0, 0, None),
+            )
+
     def test_missing_privileged_wg_never_publishes_fabricated_down_or_zero(self):
         with tempfile.TemporaryDirectory() as root:
             file = Path(root) / "traffic.tsv"

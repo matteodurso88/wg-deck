@@ -10,22 +10,22 @@ Only install a package downloaded from a trusted, reviewed GitHub Release or bui
 cd ~/progetti/wg-deck
 bash scripts/setup_env.sh
 bash scripts/build_release.sh
-sudo apt install ./dist/wg-deck_1.0.0_all.deb
+sudo apt install ./dist/wg-deck_1.0.0-2_all.deb
 wg-deck --demo
 ```
 
-APT installs the application into `/usr/lib/python3/dist-packages/wg_deck`, executable `/usr/bin/wg-deck`, helper files into `/usr/lib/wg-deck`, systemd inventory units and Polkit policies. The launcher appears in your application menu. Qt and Python dependencies are installed and updated by APT. **Install does not connect/disconnect tunnels or change routes, and does not enable the inventory service.**
+APT installs the application into `/usr/lib/python3/dist-packages/wg_deck`, executable `/usr/bin/wg-deck`, helper files into `/usr/lib/wg-deck`, systemd inventory units and Polkit policies. The launcher appears in your application menu. Qt and Python dependencies are installed and updated by APT. **Installation enables the read-only inventory path/timer automatically and publishes existing profile names immediately. It does not connect/disconnect tunnels or change routes.**
 
-## Enable optional read-only inventory
+## Inventory works automatically; optional privacy restriction
 
-After verifying your desktop account and reading the [security guide](SECURITY.md), you may opt into sanitized system names and traffic counters:
+No setup command is needed after installing on a normal systemd Ubuntu desktop. The root-owned publisher immediately creates sanitized profile-name and traffic snapshots (`0644`), readable by all local users. **This includes connection metadata, but never private keys, endpoints or configuration contents.** On a multi-user computer, an administrator may restrict snapshot visibility to the selected account's primary group (`0640`) with:
 
 ```bash
-sudo wg-deck-setup --enable-inventory "$USER"
+sudo wg-deck-setup --restrict-inventory "$USER"
 systemctl status wg-deck-inventory.timer
 ```
 
-This configures the primary group of the selected account as the snapshot reader and enables WG Deck's read-only inventory publisher. It does not run `wg-quick up` or `wg-quick down`. To stop the publisher:
+This restricts the snapshot reader group and refreshes WG Deck's already running read-only inventory publisher. It does not run `wg-quick up` or `wg-quick down`. To stop the publisher:
 
 ```bash
 sudo wg-deck-setup --disable-inventory

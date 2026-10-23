@@ -19,7 +19,7 @@ Root-owned systemd inventory .service + .path + .timer
     └── /etc/wireguard/*.conf (names, statistics; never print keys)
 ```
 
-The Debian package stages these root-owned helpers under `/usr/lib/wg-deck/` and installs Polkit actions in `/usr/share/polkit-1/actions/` and systemd units in `/usr/lib/systemd/system/`. The manual developer installer uses `/usr/local/libexec/` instead; the package builder explicitly translates those source paths and verifies the mapping. The two installation models must not be mixed. The package leaves inventory disabled until `sudo wg-deck-setup --enable-inventory USER` is run.
+The Debian package stages these root-owned helpers under `/usr/lib/wg-deck/` and installs Polkit actions in `/usr/share/polkit-1/actions/` and systemd units in `/usr/lib/systemd/system/`. The manual developer installer uses `/usr/local/libexec/` instead; the package builder explicitly translates those source paths and verifies the mapping. The two installation models must not be mixed. The Debian package automatically enables the read-only inventory service on systemd desktops and publishes sanitized root-owned snapshots accessible to local users (`0644`) at first launch. Optional group restriction (`0640`) is available through `sudo wg-deck-setup --restrict-inventory USER`.
 
 The system's `/etc/wireguard/` directory remains canonical: WG Deck never maintains a second catalogue of native profiles. Cached Qt settings store UI preferences only.
 
