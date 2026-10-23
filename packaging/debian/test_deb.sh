@@ -24,7 +24,7 @@ for file in \
   usr/share/polkit-1/actions/org.matt88.wgdeck.connection.policy \
   usr/share/applications/org.matt88.wg-deck.desktop \
   usr/share/icons/hicolor/scalable/apps/wg-deck.svg \
-  usr/share/doc/wg-deck/LICENSE usr/share/doc/wg-deck/en/INSTALL.md \
+  usr/share/doc/wg-deck/LICENSE usr/share/doc/wg-deck/copyright usr/share/doc/wg-deck/en/INSTALL.md \
   usr/share/doc/wg-deck/it/INSTALL.md; do
   [[ -f "$scratch/$file" ]] || { echo "Missing package file: $file" >&2; exit 2; }
 done
