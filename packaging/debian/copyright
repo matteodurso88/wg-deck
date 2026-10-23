@@ -1,0 +1,13 @@
+Format: https://www.debian.org/doc/packaging-manuals/copyright-format/1.0/
+Upstream-Name: WG Deck
+Upstream-Contact: https://github.com/matteodurso88/wg-deck/issues
+Source: https://github.com/matteodurso88/wg-deck
+
+Files: *
+Copyright: 2026 Matteo D'Urso
+License: GPL-3+
+ The original WG Deck sources and artwork are under GPL-3.0-or-later.
+ The complete license is shipped in /usr/share/doc/wg-deck/LICENSE.
+ .
+ System Python, PySide6/Qt, WireGuard tools and Polkit are external
+ distribution dependencies: they retain their own license terms.
