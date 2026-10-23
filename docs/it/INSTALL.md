@@ -21,7 +21,7 @@ APT installa l'app in `/usr/lib/python3/dist-packages/wg_deck`, il comando `/usr
 Su un normale desktop Ubuntu con systemd non serve alcun comando aggiuntivo. Il publisher root-owned crea subito snapshot sanitizzati di nomi e traffico con permessi `0644`, leggibili dagli utenti locali. **Contengono metadati di connessione, ma mai chiavi private, endpoint o contenuti delle configurazioni.** Su un sistema multiutente, un amministratore può limitarli al gruppo primario dell'account scelto (`0640`) con:
 
 ```bash
-sudo wg-deck-setup --enable-inventory "$USER"
+sudo wg-deck-setup --restrict-inventory "$USER"
 systemctl status wg-deck-inventory.timer
 ```
 
