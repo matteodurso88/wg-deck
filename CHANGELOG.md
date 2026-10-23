@@ -6,7 +6,7 @@ This project follows [Semantic Versioning](https://semver.org/) for releases.
 
 - Public repository extraction from the private WORKSHOP development project.
 - Initial bilingual public documentation, security and release policies.
-- Debian-only distribution candidate for Ubuntu 26.04 with APT-managed Python/PySide6, safe Polkit/systemd helper packaging, opt-in inventory setup, checksum verification and disposable installation/removal QA. No wheel/sdist release assets.
+- Debian-only distribution candidate for Ubuntu 26.04 with APT-managed Python/PySide6, safe Polkit/systemd helper packaging and checksum verification. The 1.0.0-2 Debian revision activates read-only native profile inventory at installation without extra user commands; multi-user systems may restrict metadata visibility to a primary group. No wheel/sdist release assets.
 - GitHub Actions Qt host dependency repair (`libEGL.so.1`) and package install/reinstall/remove/purge safeguards.
 
 ## [1.0.0] — planned, not released
