@@ -12,8 +12,12 @@ done
 
 version="$(python3 -c 'import tomllib; print(tomllib.load(open("pyproject.toml", "rb"))["project"]["version"])')"
 [[ "$version" =~ ^[0-9]+\.[0-9]+\.[0-9]+$ ]] || { echo "Unexpected version" >&2; exit 2; }
+# Debian packaging revision 2 upgrades the already-installed 1.0.0 candidate.
+deb_version="${version}-2"
 output="$PWD/dist"
 mkdir -p "$output"
+# Remove only earlier WG Deck .deb artifacts so checksum cannot select a stale package.
+rm -f "$output"/wg-deck_*_all.deb "$output"/SHA256SUMS
 stage="$(mktemp -d)"
 trap 'rm -rf "$stage"' EXIT
 mkdir -p "$stage/DEBIAN" "$stage/usr/bin" "$stage/usr/lib/python3/dist-packages" \
@@ -135,10 +139,11 @@ for language in en it; do
   done
 done
 install -m 0644 packaging/debian/copyright "$stage/usr/share/doc/wg-deck/copyright"
+install -m 0755 packaging/debian/postinst "$stage/DEBIAN/postinst"
 install -m 0755 packaging/debian/postrm "$stage/DEBIAN/postrm"
 cat > "$stage/DEBIAN/control" <<EOF
 Package: wg-deck
-Version: $version
+Version: $deb_version
 Section: net
 Priority: optional
 Architecture: all
@@ -149,14 +154,15 @@ Homepage: https://github.com/matteodurso88/wg-deck
 Description: Independent graphical WireGuard profile manager for Linux
  PySide6 desktop interface with separately authorized Polkit helpers.
  Native VPN configurations remain managed by the operating system.
- Installation never starts a VPN, changes routes or enables services.
+ Installation never starts a VPN or changes routes or configurations.
+ The read-only inventory service is enabled automatically on systemd hosts.
 EOF
 # Refuse accidental inclusion of private material or stage build byproducts.
 if find "$stage" \( -name '*.conf' -o -name '*.pem' -o -name '*.key' -o -name '.env' \) | grep -q .; then
   echo "Secrets or private configuration detected in package stage." >&2; exit 2
 fi
 
-destination="$output/wg-deck_${version}_all.deb"
+destination="$output/wg-deck_${deb_version}_all.deb"
 dpkg-deb --root-owner-group --build "$stage" "$destination"
 (cd "$output" && sha256sum "$(basename "$destination")" > SHA256SUMS)
 echo "Created: $destination"
