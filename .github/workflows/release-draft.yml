@@ -38,13 +38,20 @@ jobs:
           git rev-parse --verify "refs/tags/$TAG"
           test "$(git rev-parse HEAD)" = "$(git rev-parse "$TAG^{commit}")"
           test "$(git status --porcelain)" = ""
+      - name: Install Qt host dependencies
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y --no-install-recommends libegl1 libgl1 libopengl0 libxkbcommon0 libxcb-cursor0
       - name: Prepare environment
         run: bash scripts/setup_env.sh
-      - name: Quality gates, complete packaging and checksums
+      - name: Quality gate and Debian-only package checks
         env:
           QT_QPA_PLATFORM: offscreen
           QT_SCALE_FACTOR: "1"
-        run: bash scripts/build_release.sh
+        run: |
+          bash scripts/local_gate.sh
+          bash packaging/debian/build.sh
+          bash packaging/debian/test_deb.sh
       - name: Create GitHub Release draft (manual publish later)
         env:
           GH_TOKEN: ${{ github.token }}
@@ -55,6 +62,6 @@ jobs:
             echo "Release already exists; refusing to overwrite." >&2
             exit 1
           fi
-          gh release create "$TAG" dist/*.whl dist/*.tar.gz dist/SHA256SUMS \
+          gh release create "$TAG" dist/*.deb dist/SHA256SUMS \
             --verify-tag --draft --generate-notes \
             --title "WG Deck $TAG"
