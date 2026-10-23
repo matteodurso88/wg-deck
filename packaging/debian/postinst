@@ -1,0 +1,29 @@
+#!/bin/sh
+# Debian package activation: inventory only, never a WireGuard connection.
+# Fail if systemd cannot activate on a real Ubuntu system; skip in containers
+# without systemd. This script never writes existing *.conf configurations.
+set -e
+
+case "${1:-}" in
+    configure)
+        if [ -L /etc/wireguard ]; then
+            echo "Unsafe symlink for /etc/wireguard; refusing publisher setup." >&2
+            exit 1
+        fi
+        if [ ! -e /etc/wireguard ]; then
+            install -d -o root -g root -m 0700 /etc/wireguard
+        elif [ ! -d /etc/wireguard ]; then
+            echo "/etc/wireguard is not a directory." >&2
+            exit 1
+        fi
+        if [ -d /run/systemd/system ] && command -v systemctl >/dev/null 2>&1; then
+            systemctl daemon-reload
+            systemctl enable --now wg-deck-inventory.path wg-deck-inventory.timer
+            systemctl start wg-deck-inventory.service
+        else
+            echo "systemd not running (container/chroot): units will be enabled on a normal Ubuntu installation."
+        fi
+        ;;
+esac
+
+exit 0
