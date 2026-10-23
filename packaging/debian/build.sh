@@ -49,8 +49,9 @@ replacements = {
 for filename, transforms in replacements.items():
     body = filename.read_text("utf-8")
     for old, new in transforms:
-        if body.count(old) != 1:
-            raise SystemExit(f"Packaging source contract changed: {filename.name}: {old}")
+        expected = 3 if filename.name == "privileged.py" and old == "/usr/local/libexec/" else 1
+        if body.count(old) != expected:
+            raise SystemExit(f"Packaging source contract changed: {filename.name}: expected {expected} instances of {old}")
         body = body.replace(old, new)
     filename.write_text(body, encoding="utf-8")
 PY
