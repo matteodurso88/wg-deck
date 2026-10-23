@@ -1,0 +1,37 @@
+name: CI
+
+on:
+  push:
+    branches: [main, "work/**"]
+  pull_request:
+    branches: [main]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  local-equivalent:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - uses: astral-sh/setup-uv@v6
+      - name: Prepare environment
+        run: bash scripts/setup_env.sh
+      - name: Security/unit/Qt and complete release-build gates
+        env:
+          QT_QPA_PLATFORM: offscreen
+          QT_SCALE_FACTOR: "1"
+        run: bash scripts/build_release.sh
+      - name: Upload distribution candidates
+        uses: actions/upload-artifact@v4
+        with:
+          name: wg-deck-python-dists
+          path: dist/
+          if-no-files-found: error

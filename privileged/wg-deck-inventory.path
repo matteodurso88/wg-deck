@@ -1,0 +1,10 @@
+[Unit]
+Description=Track changes to native WireGuard configuration directory
+
+[Path]
+PathChanged=/etc/wireguard
+PathModified=/etc/wireguard
+Unit=wg-deck-inventory.service
+
+[Install]
+WantedBy=multi-user.target

@@ -1,0 +1,5 @@
+# Security policy / Segnalazioni di sicurezza
+
+**English:** Do **not** disclose credentials, private keys, WireGuard configuration files, recovery ZIPs, exploit details or sensitive infrastructure information in public issues or pull requests. Prefer GitHub's **Report a vulnerability** private reporting feature if enabled for the repository; otherwise contact the maintainer privately via the professional website https://matt88.it/. Include a redacted reproducer, affected version and impact. Do not test exploit scenarios against other people's networks. Vulnerability fixes require review of the privilege boundary and tests before publication.
+
+**Italiano:** Non pubblicare credenziali, chiavi, configurazioni WireGuard, backup ZIP, exploit o dettagli sensibili dell'infrastruttura in issue o pull request pubbliche. Usa la segnalazione privata **Report a vulnerability** di GitHub, se attiva; in alternativa contatta privatamente il maintainer tramite https://matt88.it/. Fornisci riproduzione anonimizzata, versione e impatto. Non effettuare prove su reti non autorizzate. Le correzioni passano review dei privilegi e test prima della pubblicazione.

@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE policyconfig PUBLIC "-//freedesktop//DTD PolicyKit Policy Configuration 1.0//EN"
+    "http://www.freedesktop.org/standards/PolicyKit/1/policyconfig.dtd">
+<policyconfig>
+  <vendor>WG Deck</vendor>
+  <action id="org.matt88.wgdeck.manage">
+    <description>Manage native WireGuard system profile configurations</description>
+    <message>Administrator authentication is required for privileged WireGuard profile configuration management</message>
+    <defaults>
+      <allow_any>no</allow_any>
+      <allow_inactive>no</allow_inactive>
+      <allow_active>auth_admin</allow_active>
+    </defaults>
+    <annotate key="org.freedesktop.policykit.exec.path">/usr/local/libexec/wg-deck-helper</annotate>
+  </action>
+</policyconfig>

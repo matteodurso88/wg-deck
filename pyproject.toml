@@ -1,0 +1,41 @@
+[build-system]
+requires = ["setuptools>=77", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "wg-deck"
+version = "1.0.0"
+description = "Independent Linux desktop manager for WireGuard configurations"
+license = "GPL-3.0-or-later"
+authors = [{name = "Matteo D’Urso"}]
+keywords = ["linux", "vpn", "wireguard", "qt", "desktop"]
+classifiers = [
+  "Development Status :: 5 - Production/Stable",
+  "Environment :: X11 Applications :: Qt",
+  "Operating System :: POSIX :: Linux",
+  "Programming Language :: Python :: 3.12",
+]
+readme = "README.md"
+requires-python = ">=3.12"
+dependencies = ["PySide6>=6.7,<7"]
+
+[project.urls]
+Homepage = "https://matt88.it"
+Repository = "https://github.com/matteodurso88/wg-deck"
+Issues = "https://github.com/matteodurso88/wg-deck/issues"
+Documentation = "https://github.com/matteodurso88/wg-deck/tree/main/docs"
+
+[project.scripts]
+wg-deck = "wg_deck.qt_app:main"
+
+[tool.setuptools]
+package-dir = {"" = "src"}
+
+[tool.setuptools.packages.find]
+where = ["src"]
+
+[tool.setuptools.package-data]
+wg_deck = ["assets/brand/*.svg"]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]

@@ -1,0 +1,32 @@
+# Build and local environments
+.venv/
+__pycache__/
+*.py[cod]
+.pytest_cache/
+.mypy_cache/
+.ruff_cache/
+build/
+dist/
+*.egg-info/
+*.whl
+
+# Local settings, temporary captures and secrets
+.env
+.env.*
+!.env.example
+*.conf
+*.key
+*.pem
+*.p12
+*.log
+local/
+reports/
+*.zip
+*.sqlite
+*.db
+
+# Editor and OS
+.idea/
+.vscode/
+.DS_Store
+*~

@@ -1,0 +1,16 @@
+# Complete source distribution: application, privileged integration and docs.
+# Wheel remains an unprivileged Python application, not a system package.
+include LICENSE
+include NOTICE.md
+include README.md
+include README.it.md
+include CHANGELOG.md
+include CONTRIBUTING.md
+include CODE_OF_CONDUCT.md
+include SECURITY.md
+recursive-include scripts *.py *.sh
+recursive-include privileged *.py *.policy *.service *.path *.timer
+recursive-include tests *.py
+recursive-include docs *.md
+recursive-include src/wg_deck/assets/brand *.svg
+global-exclude __pycache__ *.py[cod] *.conf *.pem *.key
