@@ -10,22 +10,22 @@ Installa soltanto file provenienti da una GitHub Release approvata o generati da
 cd ~/progetti/wg-deck
 bash scripts/setup_env.sh
 bash scripts/build_release.sh
-sudo apt install ./dist/wg-deck_1.0.0_all.deb
+sudo apt install ./dist/wg-deck_1.0.0-2_all.deb
 wg-deck --demo
 ```
 
-APT installa l'app in `/usr/lib/python3/dist-packages/wg_deck`, il comando `/usr/bin/wg-deck`, gli helper in `/usr/lib/wg-deck`, le unità systemd e le policy Polkit. Il launcher compare nel menu applicazioni. Python/Qt vengono aggiornati da APT. **Installare il pacchetto non connette/disconnette tunnel, non cambia route e non abilita il publisher.**
+APT installa l'app in `/usr/lib/python3/dist-packages/wg_deck`, il comando `/usr/bin/wg-deck`, gli helper in `/usr/lib/wg-deck`, le unità systemd e le policy Polkit. Il launcher compare nel menu applicazioni. Python/Qt vengono aggiornati da APT. **L'installazione abilita automaticamente il publisher in sola lettura e mostra subito i profili esistenti. Non connette/disconnette tunnel e non cambia route.**
 
-## Abilitazione facoltativa dell'inventario
+## Inventario automatico; restrizione opzionale della privacy
 
-Dopo aver verificato il tuo account e letto [Sicurezza](SECURITY.md), puoi abilitare gli snapshot sanitizzati di nomi e traffico:
+Su un normale desktop Ubuntu con systemd non serve alcun comando aggiuntivo. Il publisher root-owned crea subito snapshot sanitizzati di nomi e traffico con permessi `0644`, leggibili dagli utenti locali. **Contengono metadati di connessione, ma mai chiavi private, endpoint o contenuti delle configurazioni.** Su un sistema multiutente, un amministratore può limitarli al gruppo primario dell'account scelto (`0640`) con:
 
 ```bash
 sudo wg-deck-setup --enable-inventory "$USER"
 systemctl status wg-deck-inventory.timer
 ```
 
-Il comando abilita il gruppo primario dell'account selezionato alla lettura degli snapshot e attiva il publisher in sola lettura. Non esegue `wg-quick up` né `wg-quick down`. Per disabilitarlo:
+Il comando limita la lettura degli snapshot al gruppo primario selezionato e aggiorna il publisher in sola lettura già attivo. Non esegue `wg-quick up` né `wg-quick down`. Per disabilitarlo:
 
 ```bash
 sudo wg-deck-setup --disable-inventory
