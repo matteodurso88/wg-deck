@@ -11,15 +11,20 @@ echo "APT version: $installed"
 command -v wg-deck >/dev/null || { echo "GUI launcher missing" >&2; exit 2; }
 
 echo "=== Source and artifact ==="
-[[ "$(git branch --show-current)" == "main" ]] || { echo "Switch to public main" >&2; exit 2; }
+source_branch="$(git branch --show-current)"
+case "$source_branch" in
+  main|work/release-1-0-hardening) ;;
+  *) echo "Unsupported release-candidate branch: $source_branch" >&2; exit 2 ;;
+esac
 [[ -z "$(git status --porcelain)" ]] || { echo "Dirty Git working tree" >&2; exit 2; }
-if ! upstream="$(git ls-remote origin refs/heads/main)"; then
-  echo "Cannot verify GitHub main SHA" >&2; exit 2
+if ! upstream="$(git ls-remote --heads origin "refs/heads/$source_branch")"; then
+  echo "Cannot verify GitHub $source_branch SHA" >&2; exit 2
 fi
 remote_sha="${upstream%%[[:space:]]*}"
 [[ -n "$remote_sha" && "$remote_sha" == "$(git rev-parse HEAD)" ]] || {
-  echo "Local main does not match published GitHub main" >&2; exit 2
+  echo "Local checkout does not match GitHub $source_branch" >&2; exit 2
 }
+echo "Source branch: $source_branch"
 echo "Source SHA: $remote_sha"
 [[ -f dist/wg-deck_1.0.0-3_all.deb && -f dist/SHA256SUMS ]] || {
   echo "Local .deb/checksum not built" >&2; exit 2
