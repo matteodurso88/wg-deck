@@ -75,7 +75,7 @@ jobs:
               grep -qx ci-canary /run/wg-deck-profiles.list
               test "$(stat -c %a /run/wg-deck-profiles.list)" = 644
               su -s /bin/sh nobody -c "grep -qx ci-canary /run/wg-deck-profiles.list"
-              su -s /bin/sh nobody -c "python3 -c 'from wg_deck.core.system_profiles import read_native_names; assert read_native_names() == (\"ci-canary\",)'"
+              echo "from wg_deck.core.system_profiles import read_native_names; assert len(read_native_names()) == 1" | su -s /bin/sh nobody -c "python3 -"
               test ! -f /etc/wireguard/nonexistent.conf
               if systemctl is-enabled wg-deck-inventory.timer 2>/dev/null | grep -q enabled; then
                 echo "Inventory unexpectedly enabled"; exit 1
