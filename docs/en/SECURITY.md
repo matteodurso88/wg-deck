@@ -15,7 +15,7 @@ Native profile names are validated. Writes reject unsafe symlinks and name colli
 
 ## Debian packaging and explicit privileges
 
-The Debian package installs executable helpers as root-owned files in `/usr/lib/wg-deck/` and Polkit policies in `/usr/share/polkit-1/actions/`. Installation does not start VPN interfaces or enable inventory. Only the opt-in `sudo wg-deck-setup --enable-inventory USER` command configures the primary-group reader and starts the read-only publisher. Group members can see native interface names and traffic summaries; choose the account carefully. APT removal and purge do not touch `/etc/wireguard/`. Do not mix manual developer helpers installed under `/usr/local/libexec` with the APT-managed package.
+The Debian package installs executable helpers as root-owned files in `/usr/lib/wg-deck/` and Polkit policies in `/usr/share/polkit-1/actions/`. Installation automatically activates the **read-only** inventory publisher on systemd hosts, but never starts/stops VPN interfaces. Its root-owned, sanitized profile-name and traffic snapshots are world-readable (`0644`) by default, so other local users can see these metadata, including interface names and transfer counters. The snapshots never include keys, endpoints or configuration contents. On shared machines, restrict access to the selected user's primary group (`0640`) with `sudo wg-deck-setup --enable-inventory USER`. This restriction is optional and no manual setup is needed for first launch. APT removal and purge do not touch `/etc/wireguard/`. Do not mix manual developer helpers installed under `/usr/local/libexec` with the APT-managed package.
 
 ## Residual risks
 
