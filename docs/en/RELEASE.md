@@ -1,6 +1,6 @@
 # WG Deck — Debian-only releases
 
-The only uploaded runtime artifact is **wg-deck_1.0.0-2_all.deb**, accompanied by **SHA256SUMS**. GitHub automatically generates Source code ZIP/TAR archives for the tag. No wheel, pip sdist or AppImage is uploaded.
+The only uploaded runtime artifact is **wg-deck_1.0.0-3_all.deb**, accompanied by **SHA256SUMS**. GitHub automatically generates Source code ZIP/TAR archives for the tag. No wheel, pip sdist or AppImage is uploaded.
 
 ## Compatibility
 Initial target: **Ubuntu 26.04 LTS** with the distribution's Python 3.12+, PySide6 6.10+, Qt, systemd, Polkit and WireGuard utilities. The package contains pure Python and is named `_all.deb`; this does not mean it supports every distribution. Ubuntu 24.04 has no equivalent distro PySide6 packages and is not a supported target. AMD64 and ARM64 must each pass a clean-host test.
@@ -13,7 +13,7 @@ bash scripts/build_release.sh
 
 Outputs:
 ```text
-dist/wg-deck_1.0.0-2_all.deb
+dist/wg-deck_1.0.0-3_all.deb
 dist/SHA256SUMS
 ```
 
@@ -33,3 +33,17 @@ APT manages Python/PySide6. Installing and upgrading automatically enables the *
 
 ## Download metrics
 GitHub's Release Assets API exposes an aggregate `download_count` per uploaded .deb, not unique users or installations. Automatically generated source ZIP/TAR do not have this uploaded-asset counter. Use `python3 scripts/release_downloads.py --json`. No in-app tracking is implemented.
+
+## Dell acceptance before tagging
+
+The maintainer must validate the actual Ubuntu 26.04 desktop, not just an offscreen CI GUI:
+
+```bash
+cd ~/progetti/wg-deck
+git switch main && git pull --ff-only
+bash scripts/setup_env.sh && bash scripts/build_release.sh
+sudo apt install ./dist/wg-deck_1.0.0-3_all.deb
+bash scripts/verify_installed_deb.sh
+```
+
+Then open WG Deck **from the GNOME menu**, confirm existing profile names without setup, inspect tray behavior and perform an explicitly authorized **read-only Polkit profile-open** smoke on a known lab profile. A privileged connect/disconnect smoke is a separate, optional release-blocking check and must use only a disposable profile whose route/DNS changes are understood. Never disconnect a remote-access VPN. Record the QA result and exact main SHA before the annotated tag. The private WORKSHOP history remains preserved until this gate is closed.

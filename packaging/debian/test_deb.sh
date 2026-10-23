@@ -6,7 +6,7 @@ deb="$(find dist -maxdepth 1 -type f -name 'wg-deck_*_all.deb' -print -quit)"
 [[ -f "$deb" ]] || { echo "Debian package missing" >&2; exit 2; }
 [[ "$(dpkg-deb -f "$deb" Package)" == "wg-deck" ]]
 [[ "$(dpkg-deb -f "$deb" Architecture)" == "all" ]]
-[[ "$(dpkg-deb -f "$deb" Version)" == "1.0.0-2" ]]
+[[ "$(dpkg-deb -f "$deb" Version)" == "1.0.0-3" ]]
 deps="$(dpkg-deb -f "$deb" Depends)"
 grep -q 'python3-pyside6.qtwidgets' <<< "$deps"
 grep -q 'python3-pyside6.qtsvg' <<< "$deps"
@@ -32,6 +32,8 @@ done
 [[ ! -e "$scratch/etc/wireguard" ]] || { echo "Package would write native profiles" >&2; exit 2; }
 [[ ! -e "$scratch/etc/wg-deck-reader-gid" ]] || { echo "Unexpected user-specific reader-group state bundled" >&2; exit 2; }
 [[ -f "$scratch/DEBIAN/postinst" ]] || { echo "Missing automatic installer configuration" >&2; exit 2; }
+[[ -f "$scratch/DEBIAN/prerm" ]] || { echo "Missing safe pre-removal hook" >&2; exit 2; }
+grep -q 'systemctl disable --now wg-deck-inventory.path wg-deck-inventory.timer' "$scratch/DEBIAN/prerm"
 grep -q 'systemctl enable --now wg-deck-inventory.path wg-deck-inventory.timer' "$scratch/DEBIAN/postinst"
 grep -q 'systemctl start wg-deck-inventory.service' "$scratch/DEBIAN/postinst"
 grep -q '/usr/lib/wg-deck/wg-deck-helper' "$scratch/usr/share/polkit-1/actions/org.matt88.wgdeck.policy"
@@ -53,8 +55,12 @@ for file in (root/"usr/lib/wg-deck").glob("wg-deck-*"):
     ast.parse(file.read_text(encoding="utf-8"), filename=str(file))
 PY
 bash -n "$scratch/usr/bin/wg-deck-setup"
+sh -n "$scratch/DEBIAN/prerm"
 sh -n "$scratch/DEBIAN/postinst"
 sh -n "$scratch/DEBIAN/postrm"
+if grep -E 'wg-quick (up|down)|wg setconf' "$scratch/DEBIAN/prerm"; then
+  echo "Pre-removal hook must not manipulate VPNs" >&2; exit 2
+fi
 if grep -E 'wg-quick (up|down)|wg setconf' "$scratch/DEBIAN/postinst"; then
   echo "Post-install must not manipulate VPNs" >&2; exit 2
 fi

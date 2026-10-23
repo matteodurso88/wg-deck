@@ -1,6 +1,6 @@
 # WG Deck — distribuzione esclusivamente Debian
 
-Per ogni versione approvata vengono caricati **wg-deck_1.0.0-2_all.deb** e **SHA256SUMS**. GitHub crea automaticamente gli archivi Source code ZIP/TAR associati al tag. Non sono previsti wheel, sdist pip o AppImage come artefatti pubblici.
+Per ogni versione approvata vengono caricati **wg-deck_1.0.0-3_all.deb** e **SHA256SUMS**. GitHub crea automaticamente gli archivi Source code ZIP/TAR associati al tag. Non sono previsti wheel, sdist pip o AppImage come artefatti pubblici.
 
 ## Compatibilità
 Primo target: **Ubuntu 26.04 LTS** con Python 3.12+, PySide6 6.10+, Qt, systemd, Polkit e strumenti WireGuard gestiti da APT. Il suffisso `_all.deb` indica codice Python indipendente dall'architettura, non compatibilità universale. Ubuntu 24.04 non offre gli stessi pacchetti PySide6 nativi ed è escluso per il momento. AMD64 e ARM64 richiedono collaudi separati.
@@ -13,7 +13,7 @@ bash scripts/build_release.sh
 
 Output:
 ```text
-dist/wg-deck_1.0.0-2_all.deb
+dist/wg-deck_1.0.0-3_all.deb
 dist/SHA256SUMS
 ```
 
@@ -33,3 +33,17 @@ Python/PySide6 sono gestiti da APT. Installazione e aggiornamento abilitano auto
 
 ## Download
 La GitHub Release Assets API espone `download_count` aggregato per il pacchetto .deb: non indica utenti unici o installazioni. Gli archivi sorgenti automatici non hanno lo stesso contatore. Consulta `python3 scripts/release_downloads.py --json`. Nessuna telemetria nell'app.
+
+## Collaudo finale sul Dell prima del tag
+
+La CI headless non sostituisce il test sul vero desktop Ubuntu 26.04:
+
+```bash
+cd ~/progetti/wg-deck
+git switch main && git pull --ff-only
+bash scripts/setup_env.sh && bash scripts/build_release.sh
+sudo apt install ./dist/wg-deck_1.0.0-3_all.deb
+bash scripts/verify_installed_deb.sh
+```
+
+Poi apri WG Deck **dal menu GNOME**, verifica subito la lista dei profili nativi senza setup, controlla tray e apertura in sola lettura di un profilo di laboratorio con **autorizzazione Polkit**. La connessione/disconnessione privilegiata richiede un collaudo separato e controllato, esclusivamente su un profilo sacrificabile con route/DNS note. Non disconnettere la VPN usata per un accesso remoto. Documenta l'esito e lo SHA esatto prima del tag annotato. Lo storico WORKSHOP rimane preservato fino alla chiusura di questo gate.
