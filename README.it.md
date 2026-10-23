@@ -16,9 +16,18 @@ WG Deck integra una Dashboard PySide6, editor dei profili, diagnostica in sola l
 - Temi Light/Dark/System, tray e autoavvio opzionale della sola GUI.
 - Modalità demo con dati completamente sintetici.
 
-## Avvio rapido
+## Installazione — pacchetto Debian (Ubuntu 26.04)
 
-Per la GUI servono Linux, Python **3.12** e [uv](https://docs.astral.sh/uv/). Per le funzioni native complete: `wireguard-tools`, `iproute2`, systemd e Polkit.
+La distribuzione ufficiale prevista è un solo **.deb**, con Python e PySide6 gestiti da APT anziché inclusi nel pacchetto. Quando la release sarà approvata, potrai installarlo con:
+
+```bash
+sudo apt install ./wg-deck_1.0.0_all.deb
+wg-deck --demo
+```
+
+Il pacchetto installa app, icone, helper root-owned, policy Polkit e unità systemd. **Non abilita servizi né connette VPN automaticamente.** Il publisher in sola lettura può essere attivato esplicitamente con `sudo wg-deck-setup --enable-inventory "$USER"`. Per rimozione e upgrade consulta [Installazione](docs/it/INSTALL.md). La v1.0.0 è ancora candidata, **non una release già pubblicata**.
+
+## Anteprima dai sorgenti
 
 ```bash
 git clone https://github.com/matteodurso88/wg-deck.git
@@ -28,7 +37,7 @@ bash scripts/local_gate.sh
 bash scripts/run.sh --demo
 ```
 
-Prima di installare gli helper privilegiati con `bash scripts/install_helper.sh`, leggere la [guida all'installazione](docs/it/INSTALL.md): lo script richiede `sudo`, crea file di sistema root-owned e non avvia automaticamente i tunnel.
+Lo sviluppo usa Python 3.12 e uv. Non combinare gli helper manuali di `scripts/install_helper.sh` con quelli di APT.
 
 ## Documentazione
 
