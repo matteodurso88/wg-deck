@@ -1,0 +1,13 @@
+#!/bin/sh
+# Stop only WG Deck's read-only publisher before dpkg removes its unit files.
+# Native wg-quick@ services and /etc/wireguard are intentionally untouched.
+set -e
+case "${1:-}" in
+  remove|deconfigure)
+    if [ -d /run/systemd/system ] && command -v systemctl >/dev/null 2>&1; then
+      systemctl disable --now wg-deck-inventory.path wg-deck-inventory.timer >/dev/null 2>&1 || :
+      systemctl stop wg-deck-inventory.service >/dev/null 2>&1 || :
+    fi
+    ;;
+esac
+exit 0

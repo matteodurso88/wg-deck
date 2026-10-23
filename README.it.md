@@ -21,7 +21,7 @@ WG Deck integra una Dashboard PySide6, editor dei profili, diagnostica in sola l
 La distribuzione ufficiale prevista è un solo **.deb**, con Python e PySide6 gestiti da APT anziché inclusi nel pacchetto. Quando la release sarà approvata, potrai installarlo con:
 
 ```bash
-sudo apt install ./wg-deck_1.0.0-2_all.deb
+sudo apt install ./wg-deck_1.0.0-3_all.deb
 wg-deck --demo
 ```
 

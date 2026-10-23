@@ -20,6 +20,8 @@ fi
 "$PYTHON" -m py_compile privileged/wgdeck_helper.py privileged/wgdeck_inventory.py privileged/wgdeck_connection.py privileged/wgdeck_read.py
 "$PYTHON" -c 'import xml.etree.ElementTree as ET; ET.parse("privileged/org.matt88.wgdeck.policy"); ET.parse("privileged/org.matt88.wgdeck.connection.policy"); ET.parse("privileged/org.matt88.wgdeck.read.policy")'
 bash -n scripts/install_helper.sh scripts/uninstall_helper.sh scripts/install_desktop.sh scripts/uninstall_desktop.sh scripts/check_native_inventory.sh scripts/check_native_traffic.sh scripts/capture_demo_suite.sh scripts/build_release.sh packaging/debian/build.sh packaging/debian/test_deb.sh packaging/debian/wg-deck-setup.sh
+sh -n packaging/debian/prerm packaging/debian/postinst packaging/debian/postrm
+bash -n scripts/verify_installed_deb.sh
 env -u PYTHONPATH "$PYTHON" -m unittest discover -s tests -v
 
 echo "WG Deck candidate gate PASS (unit + security + Qt offscreen + SVG + helper syntax)."

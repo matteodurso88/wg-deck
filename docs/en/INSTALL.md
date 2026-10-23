@@ -10,7 +10,7 @@ Only install a package downloaded from a trusted, reviewed GitHub Release or bui
 cd ~/progetti/wg-deck
 bash scripts/setup_env.sh
 bash scripts/build_release.sh
-sudo apt install ./dist/wg-deck_1.0.0-2_all.deb
+sudo apt install ./dist/wg-deck_1.0.0-3_all.deb
 wg-deck --demo
 ```
 
