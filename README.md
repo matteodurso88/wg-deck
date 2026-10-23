@@ -25,7 +25,7 @@ sudo apt install ./wg-deck_1.0.0-2_all.deb
 wg-deck --demo
 ```
 
-The package installs the app, icons, root-owned helpers, Polkit policies and systemd units. On a normal Ubuntu system it **automatically starts the read-only inventory publisher**, so existing WireGuard profiles are visible at first launch without a setup command. It **never starts or stops a VPN**. The sanitized name and traffic snapshots are readable by local users by default; an administrator can restrict access to one primary group with `sudo wg-deck-setup --enable-inventory "$USER"`. For removal and upgrades see [Installation](docs/en/INSTALL.md). The .deb for v1.0.0 is still a release candidate, **not yet published**.
+The package installs the app, icons, root-owned helpers, Polkit policies and systemd units. On a normal Ubuntu system it **automatically starts the read-only inventory publisher**, so existing WireGuard profiles are visible at first launch without a setup command. It **never starts or stops a VPN**. The sanitized name and traffic snapshots are readable by local users by default; an administrator can restrict access to one primary group with `sudo wg-deck-setup --restrict-inventory "$USER"`. For removal and upgrades see [Installation](docs/en/INSTALL.md). The .deb for v1.0.0 is still a release candidate, **not yet published**.
 
 ## Source/developer preview
 
