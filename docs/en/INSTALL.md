@@ -21,7 +21,7 @@ APT installs the application into `/usr/lib/python3/dist-packages/wg_deck`, exec
 No setup command is needed after installing on a normal systemd Ubuntu desktop. The root-owned publisher immediately creates sanitized profile-name and traffic snapshots (`0644`), readable by all local users. **This includes connection metadata, but never private keys, endpoints or configuration contents.** On a multi-user computer, an administrator may restrict snapshot visibility to the selected account's primary group (`0640`) with:
 
 ```bash
-sudo wg-deck-setup --enable-inventory "$USER"
+sudo wg-deck-setup --restrict-inventory "$USER"
 systemctl status wg-deck-inventory.timer
 ```
 
