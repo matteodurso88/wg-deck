@@ -16,6 +16,6 @@ WireGuard® and the WireGuard logo are trademarks of Jason A. Donenfeld. WG Deck
 
 ## Dependencies
 
-WG Deck depends on PySide6/Qt for Python, separately licensed under LGPLv3/GPLv3 or commercial terms. The GPL license of WG Deck does not replace third-party component licenses. System software (wireguard-tools, iproute2, systemd and Polkit) is installed or provided by the user's OS and retains its own licenses. Distributors of bundles including shared libraries must retain required third-party notices and satisfy the corresponding LGPL/GPL obligations.
+WG Deck depends on PySide6/Qt for Python, separately licensed under LGPLv3/GPLv3 or commercial terms. The GPL license of WG Deck does not replace third-party component licenses. System software (wireguard-tools, iproute2, systemd and Polkit) is installed or provided by the user's OS and retains its own licenses. The official Debian package does not bundle Python, Qt or PySide6: it declares native APT dependencies, so those libraries are provided and updated by the distribution. Distributors who independently bundle shared libraries must retain applicable third-party notices and satisfy the corresponding LGPL/GPL obligations.
 
 This file is not legal advice; review license and trademark obligations before redistributing a modified or bundled release.
