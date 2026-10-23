@@ -85,6 +85,32 @@ class NativeSystemInventoryTests(unittest.TestCase):
                 with self.assertRaises(ValueError):
                     PUBLISHER.configured_group(target)
 
+    def test_default_debian_install_exposes_names_to_regular_users_without_setup(self):
+        with tempfile.TemporaryDirectory() as folder:
+            root = Path(folder)
+            configs = root / "etc_wireguard"
+            configs.mkdir(mode=0o700)
+            (configs / "existing-profile.conf").write_text("PrivateKey = SENSITIVE")
+            destination = root / "native.txt"
+            self.assertEqual(PUBLISHER.configured_group(root / "missing-reader-gid"), 0)
+            with patch.object(PUBLISHER.os, "geteuid", return_value=0), patch.object(
+                PUBLISHER.os, "fchown"
+            ):
+                names = PUBLISHER.publish(configs, destination, reader_gid=0)
+            self.assertEqual(names, ("existing-profile",))
+            self.assertEqual(destination.read_text("ascii"), "existing-profile\\n")
+            self.assertEqual(stat.S_IMODE(destination.stat().st_mode), 0o644)
+            self.assertNotIn("SENSITIVE", destination.read_text())
+
+    def test_invalid_explicit_reader_config_never_falls_back_to_public(self):
+        with tempfile.TemporaryDirectory() as folder:
+            root = Path(folder)
+            secret = root / "reader-gid"
+            secret.write_text("1000\\n")
+            (root / "link").symlink_to(secret)
+            with self.assertRaises(OSError):
+                PUBLISHER.configured_group(root / "link")
+
     def test_missing_snapshot_does_not_return_fake_profiles(self):
         with tempfile.TemporaryDirectory() as folder:
             self.assertIsNone(read_native_names(Path(folder) / "missing.txt"))
