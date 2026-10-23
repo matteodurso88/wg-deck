@@ -21,11 +21,11 @@ WG Deck integra una Dashboard PySide6, editor dei profili, diagnostica in sola l
 La distribuzione ufficiale prevista è un solo **.deb**, con Python e PySide6 gestiti da APT anziché inclusi nel pacchetto. Quando la release sarà approvata, potrai installarlo con:
 
 ```bash
-sudo apt install ./wg-deck_1.0.0_all.deb
+sudo apt install ./wg-deck_1.0.0-2_all.deb
 wg-deck --demo
 ```
 
-Il pacchetto installa app, icone, helper root-owned, policy Polkit e unità systemd. **Non abilita servizi né connette VPN automaticamente.** Il publisher in sola lettura può essere attivato esplicitamente con `sudo wg-deck-setup --enable-inventory "$USER"`. Per rimozione e upgrade consulta [Installazione](docs/it/INSTALL.md). La v1.0.0 è ancora candidata, **non una release già pubblicata**.
+Il pacchetto installa app, icone, helper root-owned, policy Polkit e unità systemd. Su Ubuntu **attiva automaticamente il publisher in sola lettura**: i profili WireGuard esistenti sono disponibili già al primo avvio, senza comandi aggiuntivi. **Non connette né disconnette VPN.** Nella modalità predefinita i metadati sanitizzati sono leggibili dagli utenti locali; un amministratore può limitarli a un gruppo primario usando `sudo wg-deck-setup --enable-inventory "$USER"`. Per rimozione e upgrade consulta [Installazione](docs/it/INSTALL.md). La v1.0.0 è ancora candidata, **non una release già pubblicata**.
 
 ## Anteprima dai sorgenti
 
