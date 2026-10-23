@@ -13,6 +13,10 @@ WG Deck's Qt GUI is deliberately **unprivileged**. Authorization and system muta
 
 Native profile names are validated. Writes reject unsafe symlinks and name collisions, respect restrictive `0600` file modes, and use revision checks, protected backups and atomic replacement where applicable. Unsupported directives and hooks are not silently rewritten. GUI autostart is unprivileged and never connects a VPN by itself. No private keys belong in logs, screenshots, Git history or issues.
 
+## Debian packaging and explicit privileges
+
+The Debian package installs executable helpers as root-owned files in `/usr/lib/wg-deck/` and Polkit policies in `/usr/share/polkit-1/actions/`. Installation does not start VPN interfaces or enable inventory. Only the opt-in `sudo wg-deck-setup --enable-inventory USER` command configures the primary-group reader and starts the read-only publisher. Group members can see native interface names and traffic summaries; choose the account carefully. APT removal and purge do not touch `/etc/wireguard/`. Do not mix manual developer helpers installed under `/usr/local/libexec` with the APT-managed package.
+
 ## Residual risks
 
 - A **trusted existing** `.conf` may contain `PreUp`, `PostUp`, `PreDown`, `PostDown`; `wg-quick` executes these with elevated privileges. Do not connect unknown/untrusted profiles.

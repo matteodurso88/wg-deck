@@ -1,0 +1,17 @@
+#!/bin/sh
+# Package-owned files are removed by dpkg. Only stop our own publisher.
+set -e
+case "$1" in
+    remove|purge)
+        if command -v systemctl >/dev/null 2>&1; then
+            systemctl disable --now wg-deck-inventory.path wg-deck-inventory.timer >/dev/null 2>&1 || :
+            systemctl stop wg-deck-inventory.service >/dev/null 2>&1 || :
+            systemctl daemon-reload >/dev/null 2>&1 || :
+        fi
+        ;;
+esac
+if [ "$1" = purge ]; then
+    # Generated, non-secret WG Deck state only; never touch native VPN profile files.
+    rm -f /etc/wg-deck-reader-gid /run/wg-deck-profiles.list /run/wg-deck-traffic.tsv
+fi
+exit 0

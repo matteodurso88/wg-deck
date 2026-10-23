@@ -1,50 +1,52 @@
-# Installation — English
+# Installation — Ubuntu 26.04 LTS
 
-**Target:** Linux desktop with Python 3.12, systemd, Polkit and WireGuard tools. GNOME/Ubuntu are tested first; other environments require independent verification.
+The official distribution candidate is a **Debian package**, currently undergoing the release gate. Ubuntu 26.04 is the initial validated APT dependency target; other distributions require separate testing. The package relies on the system Python 3.12+ and PySide6 6.10+ packages from Ubuntu's `universe` repository. Do not run the graphical app as root.
 
-## Requirements
+## Install a locally verified candidate
 
-Install Python 3.12, [uv](https://docs.astral.sh/uv/), `wireguard-tools` (`wg`, `wg-quick`), `iproute2`, Polkit (`pkexec` with a desktop authentication agent), and systemd. A graphical tray may additionally need StatusNotifier/AppIndicator support. Do not run the graphical app with `sudo`.
-
-## Demo first — unprivileged
+Only install a package downloaded from a trusted, reviewed GitHub Release or built by you from this repository. Until `v1.0.0` is published, this command refers to a **local build candidate**, not a public release.
 
 ```bash
-git clone https://github.com/matteodurso88/wg-deck.git
-cd wg-deck
+cd ~/progetti/wg-deck
+bash scripts/setup_env.sh
+bash scripts/build_release.sh
+sudo apt install ./dist/wg-deck_1.0.0_all.deb
+wg-deck --demo
+```
+
+APT installs the application into `/usr/lib/python3/dist-packages/wg_deck`, executable `/usr/bin/wg-deck`, helper files into `/usr/lib/wg-deck`, systemd inventory units and Polkit policies. The launcher appears in your application menu. Qt and Python dependencies are installed and updated by APT. **Install does not connect/disconnect tunnels or change routes, and does not enable the inventory service.**
+
+## Enable optional read-only inventory
+
+After verifying your desktop account and reading the [security guide](SECURITY.md), you may opt into sanitized system names and traffic counters:
+
+```bash
+sudo wg-deck-setup --enable-inventory "$USER"
+systemctl status wg-deck-inventory.timer
+```
+
+This configures the primary group of the selected account as the snapshot reader and enables WG Deck's read-only inventory publisher. It does not run `wg-quick up` or `wg-quick down`. To stop the publisher:
+
+```bash
+sudo wg-deck-setup --disable-inventory
+```
+
+Polkit permission is still required for reading secret configuration contents and for any native profile change. Existing WireGuard configurations remain owned by the system, not by the package.
+
+## Remove or update
+
+Turn off **Start on login** in the UI before uninstalling. Use `sudo apt remove wg-deck` to remove the package and stop its own inventory publisher. `sudo apt purge wg-deck` also removes the tool's generated state and reader-group setting. **Neither command deletes `/etc/wireguard` or stops an active VPN.** Upgrades are managed by normal APT package replacement; smoke test with a disposable profile.
+
+## Development installation (separate workflow)
+
+If you prefer a source checkout for development, run:
+
+```bash
 bash scripts/setup_env.sh
 bash scripts/local_gate.sh
 bash scripts/run.sh --demo
 ```
 
-The demo uses fictitious data and does not require a VPN configuration.
+The manual `scripts/install_helper.sh` workflow is for source-development installations only. Do not run it while the APT-managed package is installed; avoid duplicate Polkit action IDs and systemd units. For historical private installs see [Upgrade](UPGRADE.md).
 
-## Enable native profile management
-
-Review `privileged/` and the [security guide](SECURITY.md). The installer below explicitly uses `sudo` to copy root-owned helpers and Polkit policies and enable an inventory publisher. It creates `/etc/wireguard` **only if absent**; it does not edit existing profiles, open/close tunnels or change routes:
-
-```bash
-bash scripts/install_helper.sh
-bash scripts/check_native_inventory.sh
-bash scripts/check_native_traffic.sh
-bash scripts/run.sh
-```
-
-After installation, the GUI can read a restricted snapshot of native profile **names** and safe RX/TX counters; reading configuration contents or performing actions still requires Polkit as applicable. Exported `.conf` files and ZIPs contain private keys: use private destinations only.
-
-## Desktop icon and optional autostart
-
-```bash
-bash scripts/install_desktop.sh
-```
-
-The UI's **Settings → Start on login** toggle enables a user-local XDG autostart desktop entry. It starts **only the GUI**, never a VPN. If you move the checkout, turn the toggle off and back on to update its Exec path. A new public repository folder does not automatically update an older startup entry.
-
-## Uninstallation / upgrades
-
-```bash
-bash scripts/uninstall_desktop.sh
-```
-
-Before removing privileged helpers, review the exact effects of `scripts/uninstall_helper.sh`. Native WireGuard configurations are user-managed system assets: never delete them as part of an application uninstall. After updates to privileged source files, re-run local gates **before** choosing to reinstall the helpers.
-
-Do not disconnect a tunnel your current remote session relies on. Run destructive profile tests only on an isolated disposable test profile.
+Never disconnect a tunnel used by your remote session. Test privileged operations on a disposable local profile only.

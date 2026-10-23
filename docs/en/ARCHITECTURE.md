@@ -1,6 +1,6 @@
 # Architecture — English
 
-WG Deck is a Python 3.12 / PySide6 desktop application. The GUI is never run as root; external system changes are made through narrowly scoped helper commands and Polkit authorization.
+WG Deck is a Python 3.12+ / PySide6 desktop application. The Debian package uses OS-maintained Python and PySide6 6.10+. The GUI is never run as root; external system changes are made through narrowly scoped helper commands and Polkit authorization.
 
 ```text
 PySide6 UI (src/wg_deck/ui)
@@ -18,6 +18,8 @@ PySide6 UI (src/wg_deck/ui)
 Root-owned systemd inventory .service + .path + .timer
     └── /etc/wireguard/*.conf (names, statistics; never print keys)
 ```
+
+The Debian package stages these root-owned helpers under `/usr/lib/wg-deck/` and installs Polkit actions in `/usr/share/polkit-1/actions/` and systemd units in `/usr/lib/systemd/system/`. The manual developer installer uses `/usr/local/libexec/` instead; the package builder explicitly translates those source paths and verifies the mapping. The two installation models must not be mixed. The package leaves inventory disabled until `sudo wg-deck-setup --enable-inventory USER` is run.
 
 The system's `/etc/wireguard/` directory remains canonical: WG Deck never maintains a second catalogue of native profiles. Cached Qt settings store UI preferences only.
 

@@ -21,7 +21,7 @@ Il contenuto di `privileged/` è una boundary di sicurezza. Ogni modifica richie
 - `local_gate.sh` e QA visuale per interventi UI.
 - Evidenziare cambiamenti a permessi, Polkit, systemd e parser.
 - Solo log anonimizzati e immagini demo, mai chiavi.
-- Verificare wheel/sdist e gli SVG prima di una release.
+- Verificare il packaging Debian con `bash packaging/debian/build.sh` e `bash packaging/debian/test_deb.sh`, dipendenze Python/Qt APT, SVG, policy Polkit e unità systemd prima del rilascio.
 
 ## Struttura
 

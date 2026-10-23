@@ -21,7 +21,7 @@ Code in `privileged/` is a security boundary. Changes require focused unit tests
 - Run `local_gate.sh` and visual QA when applicable.
 - Mention changes to permissions, Polkit actions, systemd and configuration parser behavior.
 - Include only sanitized logs and demo screenshots. Never post real VPN keys.
-- Validate Python wheel/sdist packaging and SVG inclusion before release.
+- Validate Debian packaging with `bash packaging/debian/build.sh` and `bash packaging/debian/test_deb.sh`; inspect the APT-installed Python/Qt dependencies, original SVGs, Polkit policies and systemd units before release.
 
 ## Layout
 

@@ -1,42 +1,35 @@
-# Build, release e statistiche download — Italiano
+# WG Deck — distribuzione esclusivamente Debian
 
-## Artefatti della release
+Per ogni versione approvata vengono caricati **wg-deck_1.0.0_all.deb** e **SHA256SUMS**. GitHub crea automaticamente gli archivi Source code ZIP/TAR associati al tag. Non sono previsti wheel, sdist pip o AppImage come artefatti pubblici.
 
-La prima release pubblica deriva da un **commit verificato e taggato** (`v1.0.0`), non da uno snapshot non testato. GitHub genera automaticamente Source code ZIP/TAR per il tag. In aggiunta carichiamo:
+## Compatibilità
+Primo target: **Ubuntu 26.04 LTS** con Python 3.12+, PySide6 6.10+, Qt, systemd, Polkit e strumenti WireGuard gestiti da APT. Il suffisso `_all.deb` indica codice Python indipendente dall'architettura, non compatibilità universale. Ubuntu 24.04 non offre gli stessi pacchetti PySide6 nativi ed è escluso per il momento. AMD64 e ARM64 richiedono collaudi separati.
 
-- `wg_deck-1.0.0-py3-none-any.whl` — distribuzione Python (non installa automaticamente helper Polkit/systemd root-owned).
-- `wg_deck-1.0.0.tar.gz` — sorgenti completi, compresi `privileged/`, `scripts/`, guide EN/IT e SVG canonici (controllati da `scripts/build_release.sh`).
-- `SHA256SUMS` — checksum degli asset.
-
-La `.whl` **non è un eseguibile standalone**: servono Python 3.12, runtime Qt e strumenti di sistema. Rimandiamo un eventuale `.deb` Ubuntu x86_64/arm64 fino a test completi di installazione/rimozione, policy privilegi, aggiornamenti e rollback. Una AppImage non sarebbe completamente autonoma per gli helper privilegiati.
-
-## Build Local-First
-
+## Build e verifica Local-First
 ```bash
 bash scripts/setup_env.sh
-bash scripts/local_gate.sh
-uv pip install --python .venv/bin/python build
-.venv/bin/python -m build
-sha256sum dist/* > dist/SHA256SUMS
+bash scripts/build_release.sh
 ```
 
-Ispeziona contenuto della wheel e del sdist: tutti gli SVG devono essere presenti, senza `.conf` reali, chiavi, `.env` o dati privati.
+Output:
+```text
+dist/wg-deck_1.0.0_all.deb
+dist/SHA256SUMS
+```
 
-## Procedura di pubblicazione
+Per iterazioni limitate al pacchetto usa `bash packaging/debian/build.sh` e `bash packaging/debian/test_deb.sh`. Non installano nulla sull'host né operano sulle VPN. Il pacchetto include launcher, SVG originali, helper root-owned, policy Polkit, unità systemd e documenti bilingui.
 
-1. Scansionare e revisionare lo snapshot **prima** del push pubblico.
-2. Testare la build nel nuovo repository e acquisire screenshot demo.
-3. Collaudare installazione e rimozione su Linux pulito con profilo di laboratorio.
-4. Ottenere approvazione dell'owner sullo **SHA esatto**.
-5. Creare tag annotato `v1.0.0` e GitHub Release con artefatti e checksum.
-6. Pubblicare link su matt88.it soltanto quando gli URL di download risultano verificati.
+## Contratto d'installazione
+Python/PySide6 sono gestiti da APT. Installazione e upgrade non connettono VPN, non cambiano route o file in `/etc/wireguard` e non abilitano il publisher. L'inventario sanitizzato in sola lettura può essere attivato con il comando esplicito `sudo wg-deck-setup --enable-inventory "$USER"` e disattivato con `sudo wg-deck-setup --disable-inventory`. La rimozione arresta soltanto il publisher WG Deck; il purge elimina anche gruppo lettore e snapshot generati. Evita di combinare gli helper installati manualmente con quelli gestiti da APT.
 
-La CI crea build da ispezionare; il workflow release in bozza può essere abilitato dopo il gate di sicurezza. Non pubblicare automaticamente da un branch non collaudato.
+## Gate di pubblicazione
+1. Test e scansione segreti locali verdi, CI verde incluso install/remove isolato Ubuntu 26.04.
+2. Smoke GNOME/Wayland e Polkit reali, upgrade, rollback e disinstallazione con profilo sacrificabile. Non scollegare VPN utilizzate per accesso remoto.
+3. Revisione SHA esatto, permessi, dipendenze e licenze delle librerie.
+4. Approvazione del proprietario, tag annotato `v1.0.0` e avvio manuale di `Draft tagged release`.
+5. Verifica della bozza con soli `.deb` e `SHA256SUMS`, poi pubblicazione manuale e controllo dei link.
 
-## Tracciatura download
+**Build verde non significa release pubblicata.**
 
-La GitHub Release Assets API espone `download_count` per ogni asset caricato: permette riepiloghi aggregati per versione/architettura. **Non indica utenti unici né installazioni.** Gli archivi Source code auto-generati non offrono lo stesso contatore per asset caricati; per tracciarne i download bisogna allegare un archivio sorgente nominato esplicitamente, senza confondere i numeri con le visite alla pagina.
-
-Dopo la prima release puoi leggere i contatori pubblici con `python3 scripts/release_downloads.py` oppure `--json`: interroga la GitHub API solo su richiesta. WG Deck non inserisce tracking o telemetria utenti nell'applicazione.
-
-Documentazione: https://docs.github.com/en/rest/releases/assets.
+## Download
+La GitHub Release Assets API espone `download_count` aggregato per il pacchetto .deb: non indica utenti unici o installazioni. Gli archivi sorgenti automatici non hanno lo stesso contatore. Consulta `python3 scripts/release_downloads.py --json`. Nessuna telemetria nell'app.
