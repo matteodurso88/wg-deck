@@ -13,6 +13,10 @@ La GUI Qt di WG Deck non gira come root. Solo helper installati in percorsi **ro
 
 I nomi sono validati; la scrittura rifiuta symlink e collisioni e usa permessi `0600`, backup protetti, confronto revisioni e sostituzioni atomiche quando opportuno. Hook/direttive non supportate non vengono riscritte silenziosamente. L'autoavvio utente non connette VPN. Le chiavi non vanno mai in log, screenshot, storico Git o issue.
 
+## Packaging Debian e attivazione esplicita
+
+Il pacchetto Debian installa helper root-owned in `/usr/lib/wg-deck/` e policy Polkit in `/usr/share/polkit-1/actions/`. L'installazione non avvia VPN né abilita l'inventario. Solo il comando esplicito `sudo wg-deck-setup --enable-inventory USER` configura il gruppo primario autorizzato alla lettura e avvia il publisher in sola lettura. Gli appartenenti a tale gruppo possono vedere i nomi delle interfacce e le statistiche aggregate: scegliere attentamente l'account. La rimozione e il purge APT non modificano `/etc/wireguard/`. Non mischiare gli helper di sviluppo in `/usr/local/libexec` con il pacchetto APT.
+
 ## Rischi residui
 
 - Un file `.conf` **già esistente** può contenere `PreUp`, `PostUp`, `PreDown`, `PostDown`: `wg-quick` può eseguirli con privilegi elevati. Non connettere profili sconosciuti.
