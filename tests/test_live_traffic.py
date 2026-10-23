@@ -67,11 +67,11 @@ class MetricsSecurityTests(unittest.TestCase):
                 patch.object(PUBLISHER.os, "fchown"),
                 patch.object(PUBLISHER, "_wg_lines", return_value=""),
             ):
-                PUBLISHER.publish_traffic(("existing-profile",), destination,
+                PUBLISHER.publish_traffic(("office-vpn",), destination,
                                           reader_gid=0, now=1700000020)
             self.assertEqual(stat.S_IMODE(destination.stat().st_mode), 0o644)
             self.assertEqual(
-                parse_traffic_snapshot(destination.read_bytes(), now=1700000020)["existing-profile"],
+                parse_traffic_snapshot(destination.read_bytes(), now=1700000020)["office-vpn"],
                 TrafficRow(False, 0, 0, None),
             )
 
