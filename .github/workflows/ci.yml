@@ -64,15 +64,23 @@ jobs:
             --mount type=bind,source="$PWD/dist",target=/artifacts,readonly \
             ubuntu:26.04 bash -euc '
               apt-get update
+              install -d -m 0700 /etc/wireguard
+              printf "# synthetic fixture; do not connect\n" > /etc/wireguard/ci-canary.conf
+              before="$(sha256sum /etc/wireguard/ci-canary.conf | cut -d " " -f 1)"
               apt-get install -y --no-install-recommends /artifacts/wg-deck_*_all.deb
-              python3 -c "import wg_deck; from PySide6.QtWidgets import QApplication; from PySide6.QtSvg import QSvgRenderer; app=QApplication([]); print(\"Ubuntu 26.04 GUI import PASS\")"
+              python3 -c "import wg_deck; from PySide6.QtWidgets import QApplication; from PySide6.QtSvg import QSvgRenderer; from wg_deck.ui.window import MainWindow; app=QApplication([]); window=MainWindow(demo=True); window.close(); print(\"Ubuntu 26.04 Qt demo smoke PASS\")"
               dpkg -L wg-deck | grep -q /usr/lib/wg-deck/wg-deck-helper
               test ! -e /etc/wg-deck-reader-gid
               if systemctl is-enabled wg-deck-inventory.timer 2>/dev/null | grep -q enabled; then
                 echo "Inventory unexpectedly enabled"; exit 1
               fi
+              apt-get install -y --reinstall --no-install-recommends /artifacts/wg-deck_*_all.deb
+              test "$(sha256sum /etc/wireguard/ci-canary.conf | cut -d " " -f 1)" = "$before"
               apt-get remove -y wg-deck
+              test -f /etc/wireguard/ci-canary.conf
               test ! -e /usr/bin/wg-deck
               test ! -e /usr/lib/wg-deck/wg-deck-helper
-              echo "APT install/remove without modifying VPNs: PASS"
+              apt-get purge -y wg-deck
+              test "$(sha256sum /etc/wireguard/ci-canary.conf | cut -d " " -f 1)" = "$before"
+              echo "APT install/reinstall/remove/purge and native config preservation: PASS"
             '
