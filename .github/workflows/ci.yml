@@ -28,14 +28,51 @@ jobs:
           sudo apt-get install -y --no-install-recommends libegl1 libgl1 libopengl0 libxkbcommon0 libxcb-cursor0
       - name: Prepare environment
         run: bash scripts/setup_env.sh
-      - name: Security/unit/Qt and complete release-build gates
+      - name: Security/unit/Qt gate (editable source)
         env:
           QT_QPA_PLATFORM: offscreen
           QT_SCALE_FACTOR: "1"
-        run: bash scripts/build_release.sh
-      - name: Upload distribution candidates
+        run: bash scripts/local_gate.sh
+      - name: Build Debian package
+        run: bash packaging/debian/build.sh
+      - name: Verify Debian package layout and checksums
+        run: bash packaging/debian/test_deb.sh
+      - name: Upload Debian candidate (not published release)
         uses: actions/upload-artifact@v4
         with:
-          name: wg-deck-python-dists
-          path: dist/
+          name: wg-deck-deb-candidate
+          path: |
+            dist/*.deb
+            dist/SHA256SUMS
           if-no-files-found: error
+
+  ubuntu-2604-install-smoke:
+    needs: local-equivalent
+    runs-on: ubuntu-24.04
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+      - uses: actions/download-artifact@v4
+        with:
+          name: wg-deck-deb-candidate
+          path: dist/
+      - name: Install and remove in disposable Ubuntu 26.04 container
+        run: |
+          docker run --rm -e DEBIAN_FRONTEND=noninteractive -e QT_QPA_PLATFORM=offscreen \
+            --mount type=bind,source="$PWD/dist",target=/artifacts,readonly \
+            ubuntu:26.04 bash -euc '
+              apt-get update
+              apt-get install -y --no-install-recommends /artifacts/wg-deck_*_all.deb
+              python3 -c "import wg_deck; from PySide6.QtWidgets import QApplication; from PySide6.QtSvg import QSvgRenderer; app=QApplication([]); print(\"Ubuntu 26.04 GUI import PASS\")"
+              dpkg -L wg-deck | grep -q /usr/lib/wg-deck/wg-deck-helper
+              test ! -e /etc/wg-deck-reader-gid
+              if systemctl is-enabled wg-deck-inventory.timer 2>/dev/null | grep -q enabled; then
+                echo "Inventory unexpectedly enabled"; exit 1
+              fi
+              apt-get remove -y wg-deck
+              test ! -e /usr/bin/wg-deck
+              test ! -e /usr/lib/wg-deck/wg-deck-helper
+              echo "APT install/remove without modifying VPNs: PASS"
+            '
