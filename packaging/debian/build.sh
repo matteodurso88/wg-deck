@@ -134,6 +134,7 @@ for language in en it; do
     install -m 0644 "$file" "$stage/usr/share/doc/wg-deck/$language/$(basename "$file")"
   done
 done
+install -m 0644 packaging/debian/copyright "$stage/usr/share/doc/wg-deck/copyright"
 install -m 0755 packaging/debian/postrm "$stage/DEBIAN/postrm"
 cat > "$stage/DEBIAN/control" <<EOF
 Package: wg-deck
